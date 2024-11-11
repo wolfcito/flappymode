@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { format } from 'numerable'
 import { supabase } from '@/lib/supabase-client'
+import { Button } from '@/components/ui/button'
 
 const GRAVITY = 0.5
 const JUMP_STRENGTH = 10
@@ -178,28 +179,23 @@ export function FlappyModeGame() {
 
   const handleGameOver = async () => {
     setGameOver(true)
-
     try {
-      // Fetch current score using maybeSingle() to handle cases with no rows
       const { data: currentScore, error: fetchError } = await supabase
         .from('high_scores')
         .select('score')
         .eq('nickname', playerName)
-        .maybeSingle() // Changed to maybeSingle()
+        .maybeSingle()
 
       if (fetchError) {
         console.error('Error fetching current score:', fetchError.message)
         return
       }
 
-      // If no score exists for this player, create a new record
       if (!currentScore) {
-        console.log('No record found for player. Creating a new record...')
-
         const { data: newScoreData, error: insertError } = await supabase
           .from('high_scores')
           .insert({ nickname: playerName, score })
-
+        console.log('scores:', newScoreData)
         if (insertError) {
           console.error(
             'Error creating new player record:',
@@ -207,27 +203,21 @@ export function FlappyModeGame() {
           )
           return
         }
-
-        console.log('New player record created successfully:', newScoreData)
         setScoreUpdated(true)
       } else if (score > currentScore.score) {
-        // If the new score is higher, update the record
         const { data, error: upsertError } = await supabase
           .from('high_scores')
           .upsert({ nickname: playerName, score })
-
+        console.log('scores', data)
         if (upsertError) {
           console.error('Error updating score:', upsertError.message)
         } else {
-          console.log('Score updated successfully:', data)
           setScoreUpdated(true)
         }
       } else {
-        console.log('New score is not higher than the current score.')
         setScoreUpdated(false)
       }
 
-      // Fetch top 10 high scores
       const { data: scores, error: fetchHighScoresError } = await supabase
         .from('high_scores')
         .select('*')
@@ -248,11 +238,8 @@ export function FlappyModeGame() {
   }
 
   return (
-    <div className="flex flex-col bg-[#52ef57] items-end justify-center">
-      <div
-        className="relative w-full max-w-[380px] gap-2 col"
-        onClick={gameStarted ? handleScreenClick : undefined}
-      >
+    <div className="relative flex flex-col bg-black items-end justify-center w-full">
+      <div onClick={gameStarted ? handleScreenClick : undefined}>
         {!gameStarted && !gameOver && (
           <StartScreen
             setPlayerName={setPlayerName}
@@ -291,7 +278,7 @@ export function FlappyModeGame() {
               </div>
             )}
 
-            <Button onclick={resetGame} label="Restart" />
+            <Button onClick={resetGame}>Restart</Button>
 
             <h3 className="text-lg text-[#DFFE00]">Top 10 Leaderboard</h3>
             {highScores.map((entry, index) => (
@@ -302,9 +289,11 @@ export function FlappyModeGame() {
           </div>
         )}
 
-        {/* avatar selected */}
-        <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-red-600  bg-opacity-90 z-10">
-          <div className="w-10 h-10" style={{ top: playerPosition, left: 50 }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-opacity-90">
+          <div
+            className="w-10 h-10 absolute"
+            style={{ top: playerPosition, left: 50 }}
+          >
             <Image
               src={
                 selectedBird === 'bird1'
@@ -329,6 +318,7 @@ export function FlappyModeGame() {
                 top: candle.isTop ? 0 : 500 - candle.height,
                 width: CANDLE_WIDTH,
                 height: candle.height,
+                position: 'absolute',
                 overflow: 'hidden',
               }}
             >
@@ -343,18 +333,15 @@ export function FlappyModeGame() {
                 height={candle.height}
                 style={{ objectFit: 'cover' }}
               />
-              <span>{candle.height}</span>
             </div>
           ))}
-          <div className="flex flex-col gap-2 font-bold text-[#DFFE00] bg-black/50 md:text-lg text-sm">
+
+          <div className="absolute bottom-0 right-0 flex flex-col gap-2 font-bold text-[#DFFE00] bg-black/50 md:text-lg text-sm">
             <div className="flex items-center gap-2">{`Score: ${score}`}</div>
             <div className="flex items-center gap-2">Level: {level}</div>
           </div>
         </div>
       </div>
-      <p className="mt-4 text-sm text-white">{`Press <spacebar> or click to jump`}</p>
-
-      {/* <LeaderBoard highScores={highScores} /> */}
     </div>
   )
 }
@@ -368,8 +355,7 @@ function StartScreen({
 }: StartScreenProps) {
   const [isInputFocused, setIsInputFocused] = useState(false)
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-between space-y-4 h-full">
-      {/* <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-blue-500 bg-opacity-90 z-10"></div> */}
+    <div className="absolute inset-0 flex flex-col items-center justify-around space-y-4 h-full z-10">
       <div
         className={`p-2 rounded ${
           isInputFocused ? 'border border-[#DFFE00]' : ''
@@ -388,7 +374,7 @@ function StartScreen({
         />
       </div>
       <div>
-        <label className="text-[#DFFE00]">Choose one:</label>
+        <div className="text-[#DFFE00] text-center">Choose yours!</div>
         <div className="flex gap-2">
           <Image
             src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-mastermind"
@@ -400,10 +386,7 @@ function StartScreen({
                 ? 'border-2 border-[#DFFE00] m-1 p-1'
                 : 'm-1 p-1'
             }`}
-            onClick={(e) => {
-              e.stopPropagation()
-              setSelectedBird('bird1')
-            }}
+            onClick={() => setSelectedBird('bird1')}
           />
           <Image
             src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-spray"
@@ -413,10 +396,7 @@ function StartScreen({
             className={`cursor-pointer ${
               selectedBird === 'bird2' ? 'border-2 border-[#DFFE00] m-1' : 'm-1'
             }`}
-            onClick={(e) => {
-              e.stopPropagation()
-              setSelectedBird('bird2')
-            }}
+            onClick={() => setSelectedBird('bird2')}
           />
           <Image
             src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mochad"
@@ -428,53 +408,53 @@ function StartScreen({
                 ? 'border-2 border-[#DFFE00] m-1 p-1'
                 : 'm-1 p-1'
             }`}
-            onClick={(e) => {
-              e.stopPropagation()
-              setSelectedBird('bird3')
-            }}
+            onClick={() => setSelectedBird('bird3')}
           />
         </div>
+        <p className="mt-4 text-sm text-slate-400 text-center italic font-semibold">{`tap - tap - tap`}</p>
       </div>
       <Button
-        onclick={() => {
+        className="bg-[#DFFE00] text-black"
+        onClick={() => {
           if (selectedBird && playerName) {
             setGameStarted(true)
           } else {
             alert('Please enter your name and select a bird.')
           }
         }}
-        label="Start Game"
-      />
+      >
+        Start Game
+      </Button>
     </div>
   )
 }
 
-function LeaderBoard({
-  highScores,
-}: {
-  highScores: { nickname: string; score: number }[]
-}) {
-  return (
-    <div className="absolute top-4 right-4 text-[#DFFE00] bg-black/50 p-2">
-      <h3 className="text-lg">High Scores</h3>
-      <ul>
-        {highScores.map((entry, index) => (
-          <li key={index} className="text-white">
-            {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
+// function LeaderBoard({
+//   highScores,
+// }: {
+//   highScores: { nickname: string; score: number }[]
+// }) {
+//   return (
+//     <div className="absolute top-4 right-4 text-[#DFFE00] bg-black/50 p-2">
+//       <h3 className="text-lg">High Scores</h3>
+//       <ul>
+//         {highScores.map((entry, index) => (
+//           <li key={index} className="text-white">
+//             {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   )
+// }
 
-function Button({ onclick, label }: { onclick: () => void; label: string }) {
-  return (
-    <button
-      onClick={onclick}
-      className="text-base px-4 p-1 bg-[#DFFE00] text-[#000000] hover:bg-[#DFFE00]/90 mt-4 cursor-pointer"
-    >
-      {label}
-    </button>
-  )
-}
+// function Button({ onclick, label }: { onclick: () => void; label: string }) {
+//   return (
+//     <button
+//       onClick={onclick}
+//       className="text-base px-4 p-1 bg-[#DFFE00] text-[#000000] hover:bg-[#DFFE00]/90 mt-4 cursor-pointer"
+//     >
+//       {label}
+//     </button>
+//   )
+// }
