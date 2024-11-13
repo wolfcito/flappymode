@@ -6,12 +6,13 @@ import { format } from 'numerable'
 import { supabase } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
 
-const GRAVITY = 0.5
-const JUMP_STRENGTH = 10
+const GRAVITY = 0.3
+const JUMP_STRENGTH = 7
 const CANDLE_WIDTH = 30
 const CANDLE_GAP = 200
 const INITIAL_SPEED = 2
 const SPEED_INCREMENT = 0.5
+const OBSTACLE_INTERVAL = 100 // Controla la frecuencia de aparición de obstáculos
 
 interface Candle {
   x: number
@@ -43,45 +44,13 @@ export function FlappyModeGame() {
     { nickname: string; score: number }[]
   >([])
   const [scoreUpdated, setScoreUpdated] = useState(false)
+  const [obstacleTimer, setObstacleTimer] = useState(0) // Estado para el temporizador de obstáculos
 
   const jump = useCallback(() => {
     if (!gameOver && gameStarted) {
       setPlayerVelocity(-JUMP_STRENGTH)
     }
   }, [gameOver, gameStarted])
-
-  useEffect(() => {
-    const fetchHighScores = async () => {
-      const { data: scores, error } = await supabase
-        .from('high_scores')
-        .select('*')
-        .order('score', { ascending: false })
-        .limit(10)
-
-      if (error) {
-        console.error('Error fetching high scores:', error)
-        setHighScores([])
-      } else {
-        setHighScores(scores || [])
-      }
-    }
-
-    fetchHighScores()
-  }, [])
-
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        if (!gameStarted && !gameOver) {
-          setGameStarted(true)
-        } else {
-          jump()
-        }
-      }
-    }
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [jump, gameStarted, gameOver])
 
   useEffect(() => {
     if (!gameStarted) return
@@ -91,6 +60,7 @@ export function FlappyModeGame() {
     const gameLoop = setInterval(() => {
       if (gameOver) return
 
+      // Actualizar la posición del jugador y aplicar colisión con límites del juego
       setPlayerPosition((prevPosition) => {
         const newPosition = prevPosition + playerVelocity
         if (newPosition > 500 || newPosition < 0) {
@@ -100,32 +70,21 @@ export function FlappyModeGame() {
         return newPosition
       })
 
-      setPlayerVelocity((prevVelocity) => prevVelocity + GRAVITY)
+      // Aplicar gravedad para un movimiento más natural
+      setPlayerVelocity((prevVelocity) => prevVelocity * 0.98 + GRAVITY)
 
+      // Incrementar el temporizador de obstáculos
+      setObstacleTimer((prevTimer) => prevTimer + 1)
+
+      // Mueve los obstáculos hacia la izquierda y elimina los que salen de pantalla
       setCandles((prevCandles) => {
         const newCandles = prevCandles
           .map((candle) => ({ ...candle, x: candle.x - gameSpeed }))
           .filter((candle) => candle.x > -CANDLE_WIDTH)
-
-        if (newCandles.length < 2) {
-          const height = Math.random() * 200 + 100
-          newCandles.push({
-            x: 600,
-            height,
-            isTop: true,
-            isGreen: Math.random() > 0.5,
-          })
-          newCandles.push({
-            x: 600,
-            height: 500 - height - CANDLE_GAP,
-            isTop: false,
-            isGreen: Math.random() > 0.5,
-          })
-        }
-
         return newCandles
       })
 
+      // Incrementa el puntaje y ajusta la velocidad del juego al alcanzar ciertos puntos
       setScore((prevScore) => {
         const newScore = prevScore + 1
         if (newScore % 1000 === 0 && lastLevel === level) {
@@ -136,6 +95,7 @@ export function FlappyModeGame() {
         return newScore
       })
 
+      // Detecta colisiones entre el jugador y los obstáculos
       candles.forEach((candle) => {
         if (
           candle.x < 50 + 40 &&
@@ -160,6 +120,27 @@ export function FlappyModeGame() {
     level,
   ])
 
+  // Efecto separado para manejar la aparición de obstáculos
+  useEffect(() => {
+    // Calcula el intervalo ajustado en función de la velocidad actual del juego
+    const adjustedInterval = OBSTACLE_INTERVAL / gameSpeed
+
+    if (obstacleTimer >= adjustedInterval) {
+      const height = Math.random() * 200 + 100
+      setCandles((prevCandles) => [
+        ...prevCandles,
+        { x: 600, height, isTop: true, isGreen: Math.random() > 0.5 },
+        {
+          x: 600,
+          height: 500 - height - CANDLE_GAP,
+          isTop: false,
+          isGreen: Math.random() > 0.5,
+        },
+      ])
+      setObstacleTimer(0) // Reinicia el temporizador
+    }
+  }, [obstacleTimer, gameSpeed])
+
   const resetGame = () => {
     setPlayerPosition(250)
     setPlayerVelocity(0)
@@ -169,12 +150,7 @@ export function FlappyModeGame() {
     setGameStarted(false)
     setGameSpeed(INITIAL_SPEED)
     setLevel(1)
-  }
-
-  const handleScreenClick = () => {
-    if (gameStarted && !gameOver) {
-      jump()
-    }
+    setObstacleTimer(0) // Reiniciar el temporizador de obstáculos
   }
 
   const handleGameOver = async () => {
@@ -195,7 +171,7 @@ export function FlappyModeGame() {
         const { data: newScoreData, error: insertError } = await supabase
           .from('high_scores')
           .insert({ nickname: playerName, score })
-        console.log('scores:', newScoreData)
+        console.log('newScoreData', newScoreData)
         if (insertError) {
           console.error(
             'Error creating new player record:',
@@ -208,7 +184,7 @@ export function FlappyModeGame() {
         const { data, error: upsertError } = await supabase
           .from('high_scores')
           .upsert({ nickname: playerName, score })
-        console.log('scores', data)
+        console.log('data', data)
         if (upsertError) {
           console.error('Error updating score:', upsertError.message)
         } else {
@@ -239,7 +215,7 @@ export function FlappyModeGame() {
 
   return (
     <div className="relative flex flex-col bg-black items-end justify-center w-full">
-      <div onClick={gameStarted ? handleScreenClick : undefined}>
+      <div onClick={gameStarted ? jump : undefined}>
         {!gameStarted && !gameOver && (
           <StartScreen
             setPlayerName={setPlayerName}
@@ -251,17 +227,16 @@ export function FlappyModeGame() {
         )}
 
         {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-black bg-opacity-90 z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black bg-opacity-90 z-10">
             <h2 className="text-3xl text-[#DFFE00] mb-4">Game Over</h2>
-
             <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-2/6">
               <Image
                 src={
                   selectedBird === 'bird1'
-                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-mastermind'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1'
                     : selectedBird === 'bird2'
-                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-spray'
-                    : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mochad'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2'
+                    : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3'
                 }
                 alt="Selected Bird"
                 width={80}
@@ -278,9 +253,11 @@ export function FlappyModeGame() {
               </div>
             )}
 
-            <Button onClick={resetGame}>Restart</Button>
+            <Button onClick={resetGame} className="bg-[#DFFE00] text-black">
+              Restart
+            </Button>
 
-            <h3 className="text-lg text-[#DFFE00]">Top 10 Leaderboard</h3>
+            {/* <h3 className="text-lg text-[#DFFE00]">Top 10 Leaderboard</h3> */}
             {highScores.map((entry, index) => (
               <div key={index} className="text-left text-white">
                 {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
@@ -289,7 +266,8 @@ export function FlappyModeGame() {
           </div>
         )}
 
-        <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-opacity-90">
+        {/* Renderizado del juego en progreso */}
+        <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-opacity-90 overflow-hidden">
           <div
             className="w-10 h-10 absolute"
             style={{ top: playerPosition, left: 50 }}
@@ -297,10 +275,10 @@ export function FlappyModeGame() {
             <Image
               src={
                 selectedBird === 'bird1'
-                  ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-mastermind'
+                  ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1'
                   : selectedBird === 'bird2'
-                  ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-spray'
-                  : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mochad'
+                  ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2'
+                  : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3'
               }
               alt="Selected Bird"
               width={40}
@@ -336,7 +314,7 @@ export function FlappyModeGame() {
             </div>
           ))}
 
-          <div className="absolute bottom-0 right-0 flex flex-col gap-2 font-bold text-[#DFFE00] bg-black/50 md:text-lg text-sm">
+          <div className="absolute mb-8 bottom-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] bg-black/50 md:text-lg text-sm">
             <div className="flex items-center gap-2">{`Score: ${score}`}</div>
             <div className="flex items-center gap-2">Level: {level}</div>
           </div>
@@ -377,7 +355,7 @@ function StartScreen({
         <div className="text-[#DFFE00] text-center">Choose yours!</div>
         <div className="flex gap-2">
           <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-mastermind"
+            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1"
             alt="Bird 1"
             width={60}
             height={60}
@@ -389,7 +367,7 @@ function StartScreen({
             onClick={() => setSelectedBird('bird1')}
           />
           <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mode-spray"
+            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2"
             alt="Bird 2"
             width={60}
             height={60}
@@ -399,7 +377,7 @@ function StartScreen({
             onClick={() => setSelectedBird('bird2')}
           />
           <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/mundovirtual/main-projects/mochad"
+            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3"
             alt="Bird 3"
             width={60}
             height={60}
