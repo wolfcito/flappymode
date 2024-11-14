@@ -12,7 +12,6 @@ const CANDLE_WIDTH = 30
 const CANDLE_GAP = 200
 const INITIAL_SPEED = 2
 const SPEED_INCREMENT = 0.5
-const OBSTACLE_INTERVAL = 100 // Controla la frecuencia de aparición de obstáculos
 
 interface Candle {
   x: number
@@ -44,7 +43,6 @@ export function FlappyModeGame() {
     { nickname: string; score: number }[]
   >([])
   const [scoreUpdated, setScoreUpdated] = useState(false)
-  const [obstacleTimer, setObstacleTimer] = useState(0) // Estado para el temporizador de obstáculos
 
   const jump = useCallback(() => {
     if (!gameOver && gameStarted) {
@@ -73,14 +71,29 @@ export function FlappyModeGame() {
       // Aplicar gravedad para un movimiento más natural
       setPlayerVelocity((prevVelocity) => prevVelocity * 0.98 + GRAVITY)
 
-      // Incrementar el temporizador de obstáculos
-      setObstacleTimer((prevTimer) => prevTimer + 1)
-
       // Mueve los obstáculos hacia la izquierda y elimina los que salen de pantalla
       setCandles((prevCandles) => {
         const newCandles = prevCandles
           .map((candle) => ({ ...candle, x: candle.x - gameSpeed }))
           .filter((candle) => candle.x > -CANDLE_WIDTH)
+
+        // Genera un nuevo obstáculo si el último obstáculo está a una distancia específica
+        if (
+          newCandles.length === 0 ||
+          newCandles[newCandles.length - 1].x < 600 - CANDLE_GAP
+        ) {
+          const height = Math.random() * 200 + 100
+          newCandles.push(
+            { x: 600, height, isTop: true, isGreen: Math.random() > 0.5 },
+            {
+              x: 600,
+              height: 500 - height - CANDLE_GAP,
+              isTop: false,
+              isGreen: Math.random() > 0.5,
+            },
+          )
+        }
+
         return newCandles
       })
 
@@ -120,27 +133,6 @@ export function FlappyModeGame() {
     level,
   ])
 
-  // Efecto separado para manejar la aparición de obstáculos
-  useEffect(() => {
-    // Calcula el intervalo ajustado en función de la velocidad actual del juego
-    const adjustedInterval = OBSTACLE_INTERVAL / gameSpeed
-
-    if (obstacleTimer >= adjustedInterval) {
-      const height = Math.random() * 200 + 100
-      setCandles((prevCandles) => [
-        ...prevCandles,
-        { x: 600, height, isTop: true, isGreen: Math.random() > 0.5 },
-        {
-          x: 600,
-          height: 500 - height - CANDLE_GAP,
-          isTop: false,
-          isGreen: Math.random() > 0.5,
-        },
-      ])
-      setObstacleTimer(0) // Reinicia el temporizador
-    }
-  }, [obstacleTimer, gameSpeed])
-
   const resetGame = () => {
     setPlayerPosition(250)
     setPlayerVelocity(0)
@@ -150,7 +142,6 @@ export function FlappyModeGame() {
     setGameStarted(false)
     setGameSpeed(INITIAL_SPEED)
     setLevel(1)
-    setObstacleTimer(0) // Reiniciar el temporizador de obstáculos
   }
 
   const handleGameOver = async () => {
@@ -214,7 +205,14 @@ export function FlappyModeGame() {
   }
 
   return (
-    <div className="relative flex flex-col bg-black items-end justify-center w-full">
+    <div
+      className="relative flex flex-col bg-black items-end justify-center w-full"
+      style={{
+        backgroundImage: `url('https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappybg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
       <div onClick={gameStarted ? jump : undefined}>
         {!gameStarted && !gameOver && (
           <StartScreen
@@ -226,8 +224,8 @@ export function FlappyModeGame() {
           />
         )}
 
-        {gameOver && (
-          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black bg-opacity-90 z-10">
+        {gameOver ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black/20 z-10">
             <h2 className="text-3xl text-[#DFFE00] mb-4">Game Over</h2>
             <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-2/6">
               <Image
@@ -257,68 +255,68 @@ export function FlappyModeGame() {
               Restart
             </Button>
 
-            {/* <h3 className="text-lg text-[#DFFE00]">Top 10 Leaderboard</h3> */}
             {highScores.map((entry, index) => (
               <div key={index} className="text-left text-white">
                 {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
               </div>
             ))}
           </div>
-        )}
+        ) : null}
 
-        {/* Renderizado del juego en progreso */}
-        <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-opacity-90 overflow-hidden">
-          <div
-            className="w-10 h-10 absolute"
-            style={{ top: playerPosition, left: 50 }}
-          >
-            <Image
-              src={
-                selectedBird === 'bird1'
-                  ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1'
-                  : selectedBird === 'bird2'
-                  ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2'
-                  : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3'
-              }
-              alt="Selected Bird"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-          </div>
-
-          {candles.map((candle, index) => (
+        {gameStarted ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-black/20 overflow-hidden">
             <div
-              key={index}
-              style={{
-                backgroundColor: candle.isGreen ? '#00ff0050' : '#FF000050',
-                left: candle.x,
-                top: candle.isTop ? 0 : 500 - candle.height,
-                width: CANDLE_WIDTH,
-                height: candle.height,
-                position: 'absolute',
-                overflow: 'hidden',
-              }}
+              className="w-10 h-10 absolute shadow-2xl rounded-full"
+              style={{ top: playerPosition, left: 50 }}
             >
               <Image
                 src={
-                  candle.isGreen
-                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/moddly/green-candle'
-                    : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/moddly/red-candle'
+                  selectedBird === 'bird1'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1'
+                    : selectedBird === 'bird2'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2'
+                    : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3'
                 }
-                alt="Candle"
-                width={CANDLE_WIDTH}
-                height={candle.height}
-                style={{ objectFit: 'cover' }}
+                alt="Selected Bird"
+                width={40}
+                height={40}
+                className="rounded-full"
+                style={{ filter: 'drop-shadow(5px 0px 10px #DFFE00)' }}
               />
             </div>
-          ))}
 
-          <div className="absolute mb-8 bottom-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] bg-black/50 md:text-lg text-sm">
-            <div className="flex items-center gap-2">{`Score: ${score}`}</div>
-            <div className="flex items-center gap-2">Level: {level}</div>
+            {candles.map((candle, index) => (
+              <div
+                className=" rounded-full"
+                key={index}
+                style={{
+                  backgroundImage: `url(${
+                    candle.isTop
+                      ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/top-obstacle'
+                      : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/bottom-obstacle'
+                  })`,
+                  backgroundRepeat: 'repeat-y',
+                  backgroundSize: `${CANDLE_WIDTH}px auto`,
+                  backgroundPosition: candle.isTop ? 'bottom' : 'top',
+                  left: candle.x,
+                  top: candle.isTop ? 0 : 500 - candle.height,
+                  width: CANDLE_WIDTH,
+                  height: candle.height,
+                  position: 'absolute',
+                  overflow: 'hidden',
+                  filter: `drop-shadow(-5px ${
+                    candle.isTop ? 5 : -5
+                  }px 8px #00fff7)`,
+                }}
+              />
+            ))}
+
+            <div className="absolute mb-8 bottom-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] bg-black/50 md:text-lg text-sm">
+              <div className="flex items-center gap-2">{`Score: ${score}`}</div>
+              <div className="flex items-center gap-2">Level: {level}</div>
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   )
@@ -333,7 +331,7 @@ function StartScreen({
 }: StartScreenProps) {
   const [isInputFocused, setIsInputFocused] = useState(false)
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-around space-y-4 h-full z-10">
+    <div className="absolute inset-0 flex flex-col items-center justify-around space-y-4 h-full z-10 bg-black/50">
       <div
         className={`p-2 rounded ${
           isInputFocused ? 'border border-[#DFFE00]' : ''
@@ -352,17 +350,18 @@ function StartScreen({
         />
       </div>
       <div>
-        <div className="text-[#DFFE00] text-center">Choose yours!</div>
-        <div className="flex gap-2">
+        {/*  */}
+        <div className="text-[#DFFE00] text-center pb-2">Choose yours!</div>
+        <div className="flex gap-2 my-3">
           <Image
             src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1"
             alt="Bird 1"
             width={60}
             height={60}
-            className={`cursor-pointer ${
+            className={`cursor-pointer w-auto h-16 ${
               selectedBird === 'bird1'
-                ? 'border-2 border-[#DFFE00] m-1 p-1'
-                : 'm-1 p-1'
+                ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
+                : 'm-1 p-1 grayscale'
             }`}
             onClick={() => setSelectedBird('bird1')}
           />
@@ -371,8 +370,10 @@ function StartScreen({
             alt="Bird 2"
             width={60}
             height={60}
-            className={`cursor-pointer ${
-              selectedBird === 'bird2' ? 'border-2 border-[#DFFE00] m-1' : 'm-1'
+            className={`cursor-pointer w-auto h-16 ${
+              selectedBird === 'bird2'
+                ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
+                : 'm-1 p-1 grayscale'
             }`}
             onClick={() => setSelectedBird('bird2')}
           />
@@ -381,15 +382,15 @@ function StartScreen({
             alt="Bird 3"
             width={60}
             height={60}
-            className={`cursor-pointer ${
+            className={`cursor-pointer w-auto h-16 ${
               selectedBird === 'bird3'
-                ? 'border-2 border-[#DFFE00] m-1 p-1'
-                : 'm-1 p-1'
+                ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
+                : 'm-1 p-1 grayscale'
             }`}
             onClick={() => setSelectedBird('bird3')}
           />
         </div>
-        <p className="mt-4 text-sm text-slate-400 text-center italic font-semibold">{`tap - tap - tap`}</p>
+        <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap`}</p>
       </div>
       <Button
         className="bg-[#DFFE00] text-black"
