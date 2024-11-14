@@ -12,6 +12,10 @@ const CANDLE_WIDTH = 30
 const CANDLE_GAP = 200
 const INITIAL_SPEED = 2
 const SPEED_INCREMENT = 0.5
+const HEIGHT_STAGE = 600
+const PLAYER_HEIGHT = 40
+const PLAYER_WIDTH = 40
+const COLLISION_MARGIN = 5
 
 interface Candle {
   x: number
@@ -61,7 +65,7 @@ export function FlappyModeGame() {
       // Actualizar la posición del jugador y aplicar colisión con límites del juego
       setPlayerPosition((prevPosition) => {
         const newPosition = prevPosition + playerVelocity
-        if (newPosition > 500 || newPosition < 0) {
+        if (newPosition > HEIGHT_STAGE || newPosition < 0) {
           handleGameOver()
           return prevPosition
         }
@@ -87,7 +91,7 @@ export function FlappyModeGame() {
             { x: 600, height, isTop: true, isGreen: Math.random() > 0.5 },
             {
               x: 600,
-              height: 500 - height - CANDLE_GAP,
+              height: HEIGHT_STAGE - height - CANDLE_GAP,
               isTop: false,
               isGreen: Math.random() > 0.5,
             },
@@ -111,10 +115,13 @@ export function FlappyModeGame() {
       // Detecta colisiones entre el jugador y los obstáculos
       candles.forEach((candle) => {
         if (
-          candle.x < 50 + 40 &&
-          candle.x + CANDLE_WIDTH > 50 &&
-          ((candle.isTop && playerPosition < candle.height) ||
-            (!candle.isTop && playerPosition > 500 - candle.height))
+          candle.x < 50 + PLAYER_WIDTH - COLLISION_MARGIN && // Borde derecho del pájaro con margen
+          candle.x + CANDLE_WIDTH > 50 + COLLISION_MARGIN && // Borde izquierdo del pájaro con margen
+          ((candle.isTop &&
+            playerPosition < candle.height - COLLISION_MARGIN) || // Colisión con obstáculo superior ajustado
+            (!candle.isTop &&
+              playerPosition + PLAYER_HEIGHT >
+                600 - candle.height + COLLISION_MARGIN)) // Colisión con obstáculo inferior ajustado
         ) {
           handleGameOver()
         }
@@ -225,7 +232,7 @@ export function FlappyModeGame() {
         )}
 
         {gameOver ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black/20 z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black/75 z-10">
             <h2 className="text-3xl text-[#DFFE00] mb-4">Game Over</h2>
             <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-2/6">
               <Image
@@ -287,7 +294,7 @@ export function FlappyModeGame() {
 
             {candles.map((candle, index) => (
               <div
-                className=" rounded-full"
+                className="rounded-full"
                 key={index}
                 style={{
                   backgroundImage: `url(${
@@ -299,7 +306,7 @@ export function FlappyModeGame() {
                   backgroundSize: `${CANDLE_WIDTH}px auto`,
                   backgroundPosition: candle.isTop ? 'bottom' : 'top',
                   left: candle.x,
-                  top: candle.isTop ? 0 : 500 - candle.height,
+                  top: candle.isTop ? 0 : HEIGHT_STAGE - candle.height,
                   width: CANDLE_WIDTH,
                   height: candle.height,
                   position: 'absolute',
@@ -311,7 +318,7 @@ export function FlappyModeGame() {
               />
             ))}
 
-            <div className="absolute mb-8 bottom-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] bg-black/50 md:text-lg text-sm">
+            <div className="absolute mb-8 bottom-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] md:text-lg text-sm">
               <div className="flex items-center gap-2">{`Score: ${score}`}</div>
               <div className="flex items-center gap-2">Level: {level}</div>
             </div>
@@ -331,7 +338,7 @@ function StartScreen({
 }: StartScreenProps) {
   const [isInputFocused, setIsInputFocused] = useState(false)
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-around space-y-4 h-full z-10 bg-black/50">
+    <div className="absolute inset-0 flex flex-col items-center justify-around space-y-4 h-full z-10 bg-black/80">
       <div
         className={`p-2 rounded ${
           isInputFocused ? 'border border-[#DFFE00]' : ''
@@ -350,7 +357,11 @@ function StartScreen({
         />
       </div>
       <div>
-        {/*  */}
+        {/* ${
+          selectedBird === 'bird1'
+            ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
+            : 'm-1 p-1 grayscale'
+        } */}
         <div className="text-[#DFFE00] text-center pb-2">Choose yours!</div>
         <div className="flex gap-2 my-3">
           <Image
@@ -358,11 +369,13 @@ function StartScreen({
             alt="Bird 1"
             width={60}
             height={60}
-            className={`cursor-pointer w-auto h-16 ${
-              selectedBird === 'bird1'
-                ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
-                : 'm-1 p-1 grayscale'
-            }`}
+            className={'cursor-pointer w-auto h-16'}
+            style={{
+              filter:
+                selectedBird === 'bird1'
+                  ? 'drop-shadow(0px 0px 5px #DFFE00)'
+                  : 'grayscale(100%)',
+            }}
             onClick={() => setSelectedBird('bird1')}
           />
           <Image
@@ -370,11 +383,13 @@ function StartScreen({
             alt="Bird 2"
             width={60}
             height={60}
-            className={`cursor-pointer w-auto h-16 ${
-              selectedBird === 'bird2'
-                ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
-                : 'm-1 p-1 grayscale'
-            }`}
+            className={'cursor-pointer w-auto h-16'}
+            style={{
+              filter:
+                selectedBird === 'bird2'
+                  ? 'drop-shadow(0px 0px 5px #DFFE00)'
+                  : 'grayscale(100%)',
+            }}
             onClick={() => setSelectedBird('bird2')}
           />
           <Image
@@ -382,15 +397,17 @@ function StartScreen({
             alt="Bird 3"
             width={60}
             height={60}
-            className={`cursor-pointer w-auto h-16 ${
-              selectedBird === 'bird3'
-                ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
-                : 'm-1 p-1 grayscale'
-            }`}
+            className={'cursor-pointer w-auto h-16'}
+            style={{
+              filter:
+                selectedBird === 'bird3'
+                  ? 'drop-shadow(0px 0px 5px #DFFE00)'
+                  : 'grayscale(100%)',
+            }}
             onClick={() => setSelectedBird('bird3')}
           />
         </div>
-        <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap`}</p>
+        <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
       </div>
       <Button
         className="bg-[#DFFE00] text-black"
