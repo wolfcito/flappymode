@@ -7,14 +7,14 @@ import { supabase } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
 
 const GRAVITY = 0.3
-const JUMP_STRENGTH = 7
-const CANDLE_WIDTH = 30
+const JUMP_STRENGTH = 6
+const CANDLE_WIDTH = 60
 const CANDLE_GAP = 200
 const INITIAL_SPEED = 2
 const SPEED_INCREMENT = 0.5
 const HEIGHT_STAGE = 600
-const PLAYER_HEIGHT = 40
-const PLAYER_WIDTH = 40
+const PLAYER_HEIGHT = 60
+const PLAYER_WIDTH = 60
 const COLLISION_MARGIN = 5
 
 interface Candle {
@@ -232,7 +232,7 @@ export function FlappyModeGame() {
         )}
 
         {gameOver ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black/75 z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black z-10">
             <h2 className="text-3xl text-[#DFFE00] mb-4">Game Over</h2>
             <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-2/6">
               <Image
@@ -247,6 +247,7 @@ export function FlappyModeGame() {
                 width={80}
                 height={80}
                 className="rounded-full"
+                style={{ filter: 'drop-shadow(5px 0px 10px #DFFE00)' }}
               />
               <p className="mb-4 text-lg text-white">{`Score: ${score}`}</p>
             </div>
@@ -273,7 +274,7 @@ export function FlappyModeGame() {
         {gameStarted ? (
           <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-black/20 overflow-hidden">
             <div
-              className="w-10 h-10 absolute shadow-2xl rounded-full"
+              className="w-auto h-16 absolute shadow-2xl rounded-full"
               style={{ top: playerPosition, left: 50 }}
             >
               <Image
@@ -285,16 +286,14 @@ export function FlappyModeGame() {
                     : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3'
                 }
                 alt="Selected Bird"
-                width={40}
-                height={40}
+                width={PLAYER_WIDTH}
+                height={PLAYER_HEIGHT}
                 className="rounded-full"
-                style={{ filter: 'drop-shadow(5px 0px 10px #DFFE00)' }}
               />
             </div>
 
             {candles.map((candle, index) => (
               <div
-                className="rounded-full"
                 key={index}
                 style={{
                   backgroundImage: `url(${
@@ -311,9 +310,10 @@ export function FlappyModeGame() {
                   height: candle.height,
                   position: 'absolute',
                   overflow: 'hidden',
-                  filter: `drop-shadow(-5px ${
-                    candle.isTop ? 5 : -5
-                  }px 8px #00fff7)`,
+                  borderRadius: candle.isTop
+                    ? '10px 10px 0 0'
+                    : '0 0 10px 10px',
+                  userSelect: 'none',
                 }}
               />
             ))}
@@ -340,11 +340,11 @@ function StartScreen({
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-around space-y-4 h-full z-10 bg-black/80">
       <div
-        className={`p-2 rounded ${
+        className={`p-2 rounded flex flex-col justify-center items-center ${
           isInputFocused ? 'border border-[#DFFE00]' : ''
         }`}
       >
-        <label className="text-[#DFFE00]">Nickname:</label>
+        <label className="text-[#DFFE00]">nickname</label>
         <input
           type="text"
           value={playerName}
@@ -352,7 +352,7 @@ function StartScreen({
           onClick={(e) => e.stopPropagation()}
           onFocus={() => setIsInputFocused(true)}
           onBlur={() => setIsInputFocused(false)}
-          className={`px-2 py-1 outline-none bg-transparent text-white`}
+          className={`px-2 py-1 outline-none bg-transparent text-white text-2xl uppercase text-center`}
           maxLength={20}
         />
       </div>
