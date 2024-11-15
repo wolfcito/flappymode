@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { CSSProperties, useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { format } from 'numerable'
 import { supabase } from '@/lib/supabase-client'
@@ -292,10 +292,10 @@ export function FlappyModeGame() {
               />
             </div>
 
-            {candles.map((candle, index) => (
-              <div
-                key={index}
-                style={{
+            {candles.map((candle, index) => {
+              const candleStyle: CSSProperties & { '--final-height'?: string } =
+                {
+                  '--final-height': `${candle.height}px`,
                   backgroundImage: `url(${
                     candle.isTop
                       ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/top-obstacle'
@@ -305,18 +305,24 @@ export function FlappyModeGame() {
                   backgroundSize: `${CANDLE_WIDTH}px auto`,
                   backgroundPosition: candle.isTop ? 'bottom' : 'top',
                   left: candle.x,
-                  top: candle.isTop ? 0 : HEIGHT_STAGE - candle.height,
                   width: CANDLE_WIDTH,
-                  height: candle.height,
+                  height: '0', // Empieza con altura 0 para que crezca con la animación
                   position: 'absolute',
                   overflow: 'hidden',
                   borderRadius: candle.isTop
                     ? '10px 10px 0 0'
                     : '0 0 10px 10px',
                   userSelect: 'none',
-                }}
-              />
-            ))}
+                  transformOrigin: candle.isTop ? 'top' : 'bottom',
+                  animation: candle.isTop
+                    ? 'growFromTop 0.5s forwards'
+                    : 'growFromBottom 0.5s forwards',
+                  top: candle.isTop ? '0' : undefined, // Solo establece `top` para los obstáculos superiores
+                  bottom: candle.isTop ? undefined : '0', // Solo establece `bottom` para los obstáculos inferiores
+                }
+
+              return <div key={index} style={candleStyle} />
+            })}
 
             <div
               className="absolute mb-8 top-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] md:text-lg text-sm"

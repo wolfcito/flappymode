@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 body {
-  font-family: "Rowdies", Arial, Helvetica, sans-serif;
+  font-family: 'Rowdies', Arial, Helvetica, sans-serif;
 }
 
 @layer base {
@@ -71,5 +71,29 @@ body {
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@keyframes growFromTop {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--final-height);
+  }
+}
+
+@keyframes growFromBottom {
+  from {
+    height: 0;
+    transform: translateY(100%);
+    /* Empieza desde abajo */
+  }
+
+  to {
+    height: var(--final-height);
+    transform: translateY(0);
+    /* Llega a la posición final */
   }
 }
