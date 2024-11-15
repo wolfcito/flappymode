@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 
 const GRAVITY = 0.3
 const JUMP_STRENGTH = 6
-const CANDLE_WIDTH = 60
-const CANDLE_GAP = 200
+const CANDLE_WIDTH = 50
+const CANDLE_GAP = 250
 const INITIAL_SPEED = 2
 const SPEED_INCREMENT = 0.5
 const HEIGHT_STAGE = 600
@@ -318,7 +318,10 @@ export function FlappyModeGame() {
               />
             ))}
 
-            <div className="absolute mb-8 bottom-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] md:text-lg text-sm">
+            <div
+              className="absolute mb-8 top-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] md:text-lg text-sm"
+              style={{ left: 20, userSelect: 'none' }}
+            >
               <div className="flex items-center gap-2">{`Score: ${score}`}</div>
               <div className="flex items-center gap-2">Level: {level}</div>
             </div>
