@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 const GRAVITY = 0.3
 const JUMP_STRENGTH = 6
 const CANDLE_WIDTH = 40
-const CANDLE_GAP = 200
+const CANDLE_GAP = 250
 const INITIAL_SPEED = 2
 const SPEED_INCREMENT = 0.5
 const HEIGHT_STAGE = 600
@@ -84,18 +84,25 @@ export function FlappyModeGame() {
         // Genera un nuevo obstáculo si el último obstáculo está a una distancia específica
         if (
           newCandles.length === 0 ||
-          newCandles[newCandles.length - 1].x < 300 - CANDLE_GAP
+          newCandles[newCandles.length - 1].x < innerWidth - CANDLE_GAP
         ) {
           const height = Math.random() * 200 + 100
+
+          // Calcula una posición inicial dinámica dependiendo del tamaño de la pantalla
+          const initialX = Math.min(
+            innerWidth - 50,
+            innerWidth - CANDLE_GAP / 2,
+          )
+
           newCandles.push(
             {
-              x: innerWidth - 50,
+              x: initialX,
               height,
               isTop: true,
               isGreen: Math.random() > 0.5,
             },
             {
-              x: innerWidth - 50,
+              x: initialX,
               height: HEIGHT_STAGE - height - CANDLE_GAP,
               isTop: false,
               isGreen: Math.random() > 0.5,
@@ -158,9 +165,10 @@ export function FlappyModeGame() {
 
   const handleGameOver = async () => {
     setGameOver(true)
+
     try {
       const { data: currentScore, error: fetchError } = await supabase
-        .from('high_scores')
+        .from('flappymodeV2')
         .select('score')
         .eq('nickname', playerName)
         .maybeSingle()
@@ -172,7 +180,7 @@ export function FlappyModeGame() {
 
       if (!currentScore) {
         const { data: newScoreData, error: insertError } = await supabase
-          .from('high_scores')
+          .from('flappymodeV2')
           .insert({ nickname: playerName, score })
         console.log('newScoreData', newScoreData)
         if (insertError) {
@@ -185,7 +193,7 @@ export function FlappyModeGame() {
         setScoreUpdated(true)
       } else if (score > currentScore.score) {
         const { data, error: upsertError } = await supabase
-          .from('high_scores')
+          .from('flappymodeV2')
           .upsert({ nickname: playerName, score })
         console.log('data', data)
         if (upsertError) {
@@ -198,7 +206,7 @@ export function FlappyModeGame() {
       }
 
       const { data: scores, error: fetchHighScoresError } = await supabase
-        .from('high_scores')
+        .from('flappymodeV2')
         .select('*')
         .order('score', { ascending: false })
         .limit(10)
@@ -239,7 +247,7 @@ export function FlappyModeGame() {
         {gameOver ? (
           <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black z-10">
             <h2 className="text-3xl text-[#DFFE00] mb-4">Game Over</h2>
-            <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-2/6">
+            <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-full">
               <Image
                 src={
                   selectedBird === 'bird1'
@@ -254,7 +262,10 @@ export function FlappyModeGame() {
                 className="rounded-full"
                 style={{ filter: 'drop-shadow(5px 0px 10px #DFFE00)' }}
               />
-              <p className="mb-4 text-lg text-white">{`Score: ${score}`}</p>
+              <p className="mb-4 text-lg text-white">{`Score: ${format(
+                score,
+                '0.00 a',
+              )}`}</p>
             </div>
 
             {scoreUpdated && (
@@ -264,10 +275,18 @@ export function FlappyModeGame() {
               </div>
             )}
 
-            <Button onClick={resetGame} className="bg-[#DFFE00] text-black">
-              Restart
-            </Button>
+            <button onClick={resetGame}>
+              <Image
+                src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/reset-flappy"
+                alt="Restart Game"
+                width={80}
+                height={80}
+              />
+            </button>
 
+            <h2 className="text-left text-[#DFFE00] text-2xl mt-7">
+              Leaderboard
+            </h2>
             {highScores.map((entry, index) => (
               <div key={index} className="text-left text-white">
                 {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
@@ -423,8 +442,8 @@ function StartScreen({
         </div>
         <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
       </div>
-      <Button
-        className="bg-[#DFFE00] text-black"
+      <button
+        // className="bg-[#DFFE00] text-black"
         onClick={() => {
           if (selectedBird && playerName) {
             setGameStarted(true)
@@ -433,8 +452,14 @@ function StartScreen({
           }
         }}
       >
-        Start Game
-      </Button>
+        <Image
+          src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/play-flappy"
+          alt="Flappy Play"
+          width={80}
+          height={80}
+        />
+        {/* Start Game */}
+      </button>
     </div>
   )
 }
