@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 
 const GRAVITY = 0.3
 const JUMP_STRENGTH = 6
-const CANDLE_WIDTH = 50
-const CANDLE_GAP = 250
+const CANDLE_WIDTH = 40
+const CANDLE_GAP = 200
 const INITIAL_SPEED = 2
 const SPEED_INCREMENT = 0.5
 const HEIGHT_STAGE = 600
@@ -84,13 +84,18 @@ export function FlappyModeGame() {
         // Genera un nuevo obstáculo si el último obstáculo está a una distancia específica
         if (
           newCandles.length === 0 ||
-          newCandles[newCandles.length - 1].x < 600 - CANDLE_GAP
+          newCandles[newCandles.length - 1].x < 300 - CANDLE_GAP
         ) {
           const height = Math.random() * 200 + 100
           newCandles.push(
-            { x: 600, height, isTop: true, isGreen: Math.random() > 0.5 },
             {
-              x: 600,
+              x: innerWidth - 50,
+              height,
+              isTop: true,
+              isGreen: Math.random() > 0.5,
+            },
+            {
+              x: innerWidth - 50,
               height: HEIGHT_STAGE - height - CANDLE_GAP,
               isTop: false,
               isGreen: Math.random() > 0.5,
