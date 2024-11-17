@@ -4,7 +4,6 @@ import React, { CSSProperties, useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { format } from 'numerable'
 import { supabase } from '@/lib/supabase-client'
-import { Button } from '@/components/ui/button'
 
 const GRAVITY = 0.3
 const JUMP_STRENGTH = 6
