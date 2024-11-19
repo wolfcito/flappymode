@@ -25,8 +25,10 @@ import { NavMenu } from '@/components/nav-menu'
 
 export default function FlappyMode() {
   useEffect(() => {
-    if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.expand()
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      const webApp = window.Telegram.WebApp
+      webApp.ready()
+      webApp.expand()
     }
   }, [])
 
