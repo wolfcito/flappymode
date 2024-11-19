@@ -1,3 +1,7 @@
+'use client'
+
+import { useEffect } from 'react'
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { FlappyModeGame } from '@/components/flappy-card'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -20,6 +24,12 @@ import {
 import { NavMenu } from '@/components/nav-menu'
 
 export default function FlappyMode() {
+  useEffect(() => {
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.expand()
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-black">
       <div className="mx-auto max-w-2xl flex flex-col gap-2 items-center">

@@ -47,14 +47,6 @@ export function FlappyModeGame() {
   >([])
   const [scoreUpdated, setScoreUpdated] = useState(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      const webApp = window.Telegram.WebApp
-      webApp.ready()
-      webApp.expand()
-    }
-  }, [])
-
   const jump = useCallback(() => {
     if (!gameOver && gameStarted) {
       setPlayerVelocity(-JUMP_STRENGTH)
