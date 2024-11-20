@@ -11,6 +11,8 @@
 
 body {
   font-family: 'QuickZap', sans-serif;
+  height: 100%;
+  overflow: hidden;
 }
 
 @layer base {

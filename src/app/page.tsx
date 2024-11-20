@@ -27,8 +27,25 @@ export default function FlappyMode() {
   useEffect(() => {
     if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
       const webApp = window.Telegram.WebApp
+
+      // Llamar a ready() para asegurarse de que el WebApp esté listo
       webApp.ready()
-      webApp.expand()
+
+      // Detectar la plataforma
+      const platform = webApp.platform // "android" o "ios"
+
+      if (platform === 'ios') {
+        // Ajustar la altura del body para iOS
+        document.body.style.height = '100vh'
+
+        // Retrasar la llamada a expand() para iOS
+        setTimeout(() => {
+          webApp.expand()
+        }, 300)
+      } else {
+        // Expandir inmediatamente para otras plataformas
+        webApp.expand()
+      }
     }
   }, [])
 
