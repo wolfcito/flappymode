@@ -9,6 +9,11 @@
   font-style: normal;
 }
 
+html {
+  position: fixed;
+  height: auto !important;
+}
+
 body {
   font-family: 'QuickZap', sans-serif;
   height: 100%;
