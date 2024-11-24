@@ -235,8 +235,6 @@ export function FlappyModeGame() {
         backgroundPosition: 'center',
       }}
     >
-      {/* {showEarnScreen && <EarnScreen />}
-      {showRankingScreen && <RankingScreen />} */}
       <div onClick={gameStarted ? jump : undefined}>
         {!gameStarted && !gameOver && (
           <StartScreen
@@ -291,21 +289,12 @@ export function FlappyModeGame() {
                 alt="Restart Game"
                 width={80}
                 height={80}
-                className="w-auto h-20"
+                className="w-auto h-28"
                 style={{
                   filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))',
                 }}
               />
             </button>
-
-            {/* <h2 className="text-left text-[#DFFE00] text-2xl mt-7">
-              Leaderboard
-            </h2>
-            {highScores.map((entry, index) => (
-              <div key={index} className="text-left text-white">
-                {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
-              </div>
-            ))} */}
           </div>
         ) : null}
 
@@ -462,7 +451,7 @@ function StartScreen({
         </div>
         <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
       </div>
-      {/* // className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-black px-4 py-2" */}
+
       <button
         className="py-14"
         onClick={() => {
@@ -478,7 +467,7 @@ function StartScreen({
           alt="Flappy Play"
           width={80}
           height={80}
-          className="w-auto h-20"
+          className="w-auto h-28"
           style={{ filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))' }}
         />
       </button>

@@ -11,7 +11,7 @@ export function NavMenu() {
   const isActive = (path: string) => pathname === path
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 z-10">
+    <div className="fixed bottom-0 left-0 right-0 bg-zinc-900 z-10">
       <div className="flex justify-around py-4 relative">
         <div className="absolute bottom-4 left-4">
           <Link href="/">
@@ -31,7 +31,7 @@ export function NavMenu() {
         <div className="flex justify-around flex-1 pl-24">
           <Link
             href="/"
-            className={`flex flex-col items-center ${
+            className={`flex flex-col items-center w-16 ${
               isActive('/') ? 'text-[#DFFE00]' : 'text-gray-400'
             }`}
           >
@@ -40,7 +40,7 @@ export function NavMenu() {
           </Link>
           <Link
             href="/earn"
-            className={`flex flex-col items-center ${
+            className={`flex flex-col items-center w-16 ${
               isActive('/earn') ? 'text-[#DFFE00]' : 'text-gray-400'
             }`}
           >
@@ -49,7 +49,7 @@ export function NavMenu() {
           </Link>
           <Link
             href="/ranking"
-            className={`flex flex-col items-center ${
+            className={`flex flex-col items-center w-16 ${
               isActive('/ranking') ? 'text-[#DFFE00]' : 'text-gray-400'
             }`}
           >
