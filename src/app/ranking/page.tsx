@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase-client'
 
-import { Medal } from 'lucide-react'
+import Image from 'next/image'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 export default function Leaderboard() {
@@ -47,12 +47,9 @@ export default function Leaderboard() {
   }, [])
   return (
     <>
-      {/* Rankings Title */}
-      <h2 className="text-4xl font-bold px-4 py-6">Rankings</h2>
+      <h2 className="text-4xl font-bold px-4 py-6 text-[#DFFE00]">Rankings</h2>
 
-      {/* Rankings List */}
       <div className="space-y-2 px-4">
-        {/* Top Position */}
         <div className="bg-zinc-900 rounded-lg p-4 flex items-center justify-between font-sans">
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12 bg-[#B4E3DB]">
@@ -68,9 +65,8 @@ export default function Leaderboard() {
           <span className="text-gray-400">{'>'}100</span>
         </div>
 
-        <h3 className="text-2xl font-bold py-4">TOP 100</h3>
+        <h3 className="text-2xl font-bold py-4 text-[#DFFE00]">TOP 100</h3>
 
-        {/* Ranking Items */}
         <div className="space-y-2 overflow-y-auto max-h-[60vh] pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 pb-20 font-sans">
           {[
             {
@@ -134,15 +130,20 @@ export default function Leaderboard() {
                   <p className="text-gray-400">{item.amount} $veMode</p>
                 </div>
               </div>
+
               {item.rank <= 3 ? (
-                <Medal
-                  className={`h-6 w-6 ${
+                <Image
+                  src={
                     item.rank === 1
-                      ? 'text-yellow-500'
+                      ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/goldmedal'
                       : item.rank === 2
-                      ? 'text-blue-500'
-                      : 'text-orange-500'
-                  }`}
+                      ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/platemedal'
+                      : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/coopermedal'
+                  }
+                  alt={`Rank ${item.rank}`}
+                  width={24}
+                  height={24}
+                  className="w-auto h-6"
                 />
               ) : (
                 <span className="text-gray-400">#{item.rank}</span>
