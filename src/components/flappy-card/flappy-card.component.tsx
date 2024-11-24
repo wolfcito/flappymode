@@ -26,7 +26,7 @@ interface Candle {
 interface StartScreenProps {
   readonly playerName: string
   readonly setPlayerName: (value: string) => void
-  // readonly selectedBird: string
+  readonly selectedBird: string
   readonly setSelectedBird: (value: string) => void
   readonly setGameStarted: (value: boolean) => void
 }
@@ -241,7 +241,7 @@ export function FlappyModeGame() {
             setPlayerName={setPlayerName}
             playerName={playerName}
             setGameStarted={setGameStarted}
-            // selectedBird={selectedBird}
+            selectedBird={selectedBird}
             setSelectedBird={setSelectedBird}
           />
         )}
@@ -256,7 +256,7 @@ export function FlappyModeGame() {
             >
               Game Over
             </h2>
-            <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-full">
+            <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-full gap-4">
               <Image
                 src={
                   selectedBird === 'bird1'
@@ -270,10 +270,23 @@ export function FlappyModeGame() {
                 height={80}
                 className="rounded-full h-28 w-auto"
               />
-              <p className="mb-4 text-lg text-white">{`Score: ${format(
-                score,
-                '0.00 a',
-              )}`}</p>
+              <div className="flex items-center gap-2">
+                <Image
+                  src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/scoreicon"
+                  alt="Bird 1"
+                  width={PLAYER_WIDTH}
+                  height={PLAYER_HEIGHT}
+                  className="h-8 w-auto"
+                />
+                <div
+                  className="text-4xl text-[#DFFE00]"
+                  style={{
+                    textShadow: '1px 1px 1px #293B94, -1px -1px 0px #293B94',
+                  }}
+                >
+                  {format(score, '0.00 a')}
+                </div>
+              </div>
             </div>
 
             {scoreUpdated && (
@@ -289,10 +302,8 @@ export function FlappyModeGame() {
                 alt="Restart Game"
                 width={80}
                 height={80}
-                className="w-auto h-28"
-                style={{
-                  filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))',
-                }}
+                className="w-auto h-20"
+                style={{ filter: 'drop-shadow(1px 0px 2px #293B94)' }}
               />
             </button>
           </div>
@@ -316,7 +327,7 @@ export function FlappyModeGame() {
                 width={PLAYER_WIDTH}
                 height={PLAYER_HEIGHT}
                 className="h-20 w-auto"
-                style={{ filter: 'drop-shadow(5px 0px 10px #DFFE00)' }}
+                style={{ filter: 'drop-shadow(0px 0px 5px #ffffff)' }}
               />
             </div>
 
@@ -353,11 +364,44 @@ export function FlappyModeGame() {
             })}
 
             <div
-              className="absolute mb-8 top-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] md:text-lg text-sm"
+              className="absolute mb-8 top-0 left-0 flex flex-col gap-2 font-bold text-[#DFFE00] md:text-lg text-sm font-sans"
               style={{ left: 20, userSelect: 'none' }}
             >
-              <div className="flex items-center gap-2">{`Score: ${score}`}</div>
-              <div className="flex items-center gap-2">Level: {level}</div>
+              <div className="flex items-center gap-2">
+                <div className="w-3">
+                  <Image
+                    src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/scoreicon"
+                    alt="Bird 1"
+                    width={PLAYER_WIDTH}
+                    height={PLAYER_HEIGHT}
+                    className="h-3 w-auto"
+                  />
+                </div>
+                <div
+                  style={{
+                    textShadow: '1px 1px 1px #293B94, -1px -1px 0px #293B94',
+                  }}
+                >
+                  {score}
+                </div>
+              </div>
+              <div
+                className="flex items-center gap-2"
+                style={{
+                  textShadow: '1px 1px 1px #293B94, -1px -1px 0px #293B94',
+                }}
+              >
+                <div className="w-3">
+                  <Image
+                    src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/levelicon"
+                    alt="Bird 1"
+                    width={PLAYER_WIDTH}
+                    height={PLAYER_HEIGHT}
+                    className="h-3 w-auto"
+                  />
+                </div>
+                {level}
+              </div>
             </div>
           </div>
         ) : null}
@@ -365,115 +409,6 @@ export function FlappyModeGame() {
     </div>
   )
 }
-
-// function StartScreen({
-//   playerName,
-//   setPlayerName,
-//   selectedBird,
-//   setSelectedBird,
-//   setGameStarted,
-// }: StartScreenProps) {
-//   const [isInputFocused, setIsInputFocused] = useState(false)
-//   return (
-//     <div className="absolute inset-0 flex flex-col items-center h-full z-10 bg-blue-300/60 backdrop-blur-sm">
-//       <div
-//         className={`p-2 rounded flex flex-col justify-center items-center ${
-//           isInputFocused ? 'border border-[#DFFE00]' : ''
-//         }`}
-//       >
-//         {/* <label
-//           className="text-[#DFFE00]"
-//           style={{
-//             textShadow: '1px 1px 2px #293B94, -1px -1px 2px #293B94',
-//           }}
-//         >
-//           Welcome,
-//         </label> */}
-//         <input
-//           type="text"
-//           value={playerName}
-//           onChange={(e) => setPlayerName(e.target.value)}
-//           onClick={(e) => e.stopPropagation()}
-//           onFocus={() => setIsInputFocused(true)}
-//           onBlur={() => setIsInputFocused(false)}
-//           className={`px-2 py-14 outline-none bg-transparent text-[#DFFE00] text-4xl uppercase text-center `}
-//           style={{
-//             textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
-//           }}
-//           maxLength={20}
-//         />
-//       </div>
-//       <div>
-//         <div className="text-[#DFFE00] text-center pb-2">Choose yours!</div>
-//         <div className="flex gap-2 my-3">
-//           <Image
-//             src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar001"
-//             alt="Bird 1"
-//             width={PLAYER_WIDTH}
-//             height={PLAYER_HEIGHT}
-//             className={`cursor-pointer w-auto h-[80px]`}
-//             style={{
-//               filter:
-//                 selectedBird === 'bird1'
-//                   ? 'drop-shadow(0px 0px 5px #DFFE00)'
-//                   : 'grayscale(100%)',
-//             }}
-//             onClick={() => setSelectedBird('bird1')}
-//           />
-//           <Image
-//             src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar002"
-//             alt="Bird 2"
-//             width={60}
-//             height={60}
-//             className={`cursor-pointer w-auto h-[80px]`}
-//             style={{
-//               filter:
-//                 selectedBird === 'bird2'
-//                   ? 'drop-shadow(0px 0px 5px #DFFE00)'
-//                   : 'grayscale(100%)',
-//             }}
-//             onClick={() => setSelectedBird('bird2')}
-//           />
-//           <Image
-//             src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar005"
-//             alt="Bird 3"
-//             width={60}
-//             height={60}
-//             className={`cursor-pointer w-auto h-[80px]`}
-//             style={{
-//               filter:
-//                 selectedBird === 'bird3'
-//                   ? 'drop-shadow(0px 0px 5px #DFFE00)'
-//                   : 'grayscale(100%)',
-//             }}
-//             onClick={() => setSelectedBird('bird3')}
-//           />
-//         </div>
-//         <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
-//       </div>
-
-//       <button
-//         className="py-14"
-//         onClick={() => {
-//           if (selectedBird && playerName) {
-//             setGameStarted(true)
-//           } else {
-//             alert('Please enter your name and select a bird.')
-//           }
-//         }}
-//       >
-//         <Image
-//           src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/playbtn"
-//           alt="Flappy Play"
-//           width={80}
-//           height={80}
-//           className="w-auto h-28"
-//           style={{ filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))' }}
-//         />
-//       </button>
-//     </div>
-//   )
-// }
 
 function StartScreen({
   playerName,
@@ -483,8 +418,8 @@ function StartScreen({
 }: StartScreenProps) {
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [avatarIndex, setAvatarIndex] = useState(0)
+  const [countdown, setCountdown] = useState<number | null>(null)
 
-  // Avatars disponibles
   const avatars = [
     {
       id: 'bird1',
@@ -500,7 +435,6 @@ function StartScreen({
     },
   ]
 
-  // Funciones para navegar entre avatars
   const handlePreviousAvatar = () => {
     setAvatarIndex((prevIndex) =>
       prevIndex === 0 ? avatars.length - 1 : prevIndex - 1,
@@ -513,107 +447,181 @@ function StartScreen({
     )
   }
 
-  // Actualizamos el avatar seleccionado
   useEffect(() => {
     setSelectedBird(avatars[avatarIndex].id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [avatarIndex, setSelectedBird])
 
+  const COOLDOWN = 3
+  const handleStartGame = () => {
+    if (!playerName) {
+      alert('Please enter your name.')
+      return
+    }
+
+    setCountdown(COOLDOWN)
+  }
+
+  useEffect(() => {
+    if (countdown === null) return
+
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      return () => clearTimeout(timer)
+    } else {
+      setGameStarted(true)
+    }
+  }, [countdown, setGameStarted])
+
   return (
     <div className="absolute inset-0 flex flex-col items-center h-full z-10 bg-blue-300/60 backdrop-blur-sm">
-      <div
-        className={`p-2 rounded flex flex-col justify-center items-center ${
-          isInputFocused ? 'border border-[#DFFE00]' : ''
-        }`}
-      >
-        <input
-          type="text"
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-          onClick={(e) => e.stopPropagation()}
-          onFocus={() => setIsInputFocused(true)}
-          onBlur={() => setIsInputFocused(false)}
-          className={`px-2 py-14 outline-none bg-transparent text-[#DFFE00] text-4xl uppercase text-center `}
-          style={{
-            textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
-          }}
-          maxLength={20}
-        />
-      </div>
-      <div className="flex flex-col items-center space-y-4">
-        <div
-          className="text-white text-center pb-2"
-          style={{
-            textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
-          }}
-        >
-          Pick yours:
-        </div>
+      {countdown !== null ? (
+        <div className="flex flex-col items-center justify-between px-4 py-8 z-20">
+          <h2
+            className="text-4xl text-white mb-4"
+            style={{
+              textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+            }}
+          >
+            Get ready
+          </h2>
+          <div
+            className="absolute text-8xl text-[#DFFE00] mb-4 animate-ping top-1/2 z-10"
+            style={{
+              textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+            }}
+          >
+            {countdown}
+          </div>
 
-        {/* Botones de navegación y avatar */}
-        <div className="flex items-center gap-4 flex-1">
-          <button onClick={handlePreviousAvatar}>
-            <Image
-              src={
-                'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/leftbtn'
-              }
-              alt="Selected Bird"
-              width={80}
-              height={80}
-              className="w-auto h-8"
-            />
-          </button>
-          <div className="w-60 flex items-center justify-center">
-            <Image
-              src={avatars[avatarIndex].src}
-              alt="Selected Bird"
-              width={80}
-              height={80}
-              className="w-auto h-28"
-              style={{ filter: 'drop-shadow(0px 0px 5px #DFFE00)' }}
+          <div className="flex flex-col items-center gap-4 flex-1 pt-10">
+            <div>
+              <Image
+                src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/upbtn"
+                alt="Flappy Play"
+                width={80}
+                height={80}
+                className="w-auto h-10 animate-bounce"
+              />
+            </div>
+            <div className="w-60 h-60 flex items-center justify-center">
+              <Image
+                src={avatars[avatarIndex].src}
+                alt="Selected Bird"
+                width={80}
+                height={80}
+                className="w-auto h-28"
+              />
+            </div>
+            <div>
+              <Image
+                src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/downbtn"
+                alt="Flappy Play"
+                width={80}
+                height={80}
+                className="w-auto h-10 animate-bounce"
+              />
+            </div>
+          </div>
+          <div
+            className="text-white text-center pb-2"
+            style={{
+              textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+            }}
+          >
+            {`tap - tap - tap!`}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div
+            className={`p-2 rounded flex flex-col justify-center items-center ${
+              isInputFocused ? 'border border-[#DFFE00]' : ''
+            }`}
+          >
+            <input
+              type="text"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
+              className={`px-2 py-14 outline-none bg-transparent text-[#DFFE00] text-4xl uppercase text-center `}
+              style={{
+                textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+              }}
+              maxLength={20}
             />
           </div>
-          <button onClick={handleNextAvatar}>
+          <div className="flex flex-col items-center space-y-4">
+            <div
+              className="text-white text-center pb-2"
+              style={{
+                textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+              }}
+            >
+              Pick yours:
+            </div>
+
+            <div className="flex items-center gap-4 flex-1">
+              <button onClick={handlePreviousAvatar}>
+                <Image
+                  src={
+                    'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/leftbtn'
+                  }
+                  alt="Selected Bird"
+                  width={80}
+                  height={80}
+                  className="w-auto h-8"
+                />
+              </button>
+              <div className="w-60 flex items-center justify-center">
+                <Image
+                  src={avatars[avatarIndex].src}
+                  alt="Selected Bird"
+                  width={80}
+                  height={80}
+                  className="w-auto h-28"
+                  style={{ filter: 'drop-shadow(0px 0px 5px #ffffff)' }}
+                />
+              </div>
+              <button onClick={handleNextAvatar}>
+                <Image
+                  src={
+                    'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/rightbtn'
+                  }
+                  alt="Selected Bird"
+                  width={80}
+                  height={80}
+                  className="w-auto h-8"
+                />
+              </button>
+            </div>
+            <div
+              className="text-white text-center pb-2"
+              style={{
+                textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+              }}
+            >
+              {`tap - tap - tap!`}
+            </div>
+          </div>
+
+          <button
+            className="py-14 transition ease-in-out delay-150"
+            onClick={handleStartGame}
+          >
             <Image
-              src={
-                'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/rightbtn'
-              }
-              alt="Selected Bird"
+              src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/playbtn"
+              alt="Flappy Play"
               width={80}
               height={80}
-              className="w-auto h-8"
+              className="w-auto h-20"
+              style={{ filter: 'drop-shadow(1px 0px 5px #293B94)' }}
             />
           </button>
-        </div>
-        <div
-          className="text-white text-center pb-2"
-          style={{
-            textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
-          }}
-        >
-          {`tap - tap - tap!`}
-        </div>
-      </div>
-
-      <button
-        className="py-14"
-        onClick={() => {
-          if (playerName) {
-            setGameStarted(true)
-          } else {
-            alert('Please enter your name.')
-          }
-        }}
-      >
-        <Image
-          src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/playbtn"
-          alt="Flappy Play"
-          width={80}
-          height={80}
-          className="w-auto h-28"
-          style={{ filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))' }}
-        />
-      </button>
+        </>
+      )}
     </div>
   )
 }
