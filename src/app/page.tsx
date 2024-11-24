@@ -35,7 +35,7 @@ export default function FlappyMode() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-blue-300/60 backdrop-blur-sm">
       <div className="mx-auto max-w-2xl flex flex-col gap-2 items-center">
         <Card className="w-full h-[600px] border-none">
           <CardContent className="p-0 h-full flex">
@@ -43,7 +43,7 @@ export default function FlappyMode() {
           </CardContent>
         </Card>
       </div>
-      {/* <NavMenu /> */}
+      <NavMenu />
     </div>
   )
 }
