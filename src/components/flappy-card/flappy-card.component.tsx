@@ -420,6 +420,14 @@ function StartScreen({
   const [avatarIndex, setAvatarIndex] = useState(0)
   const [countdown, setCountdown] = useState<number | null>(null)
 
+  const nickname = useTelegramUser()
+
+  useEffect(() => {
+    if (nickname) {
+      setPlayerName(nickname)
+    }
+  }, [nickname, setPlayerName])
+
   const avatars = [
     {
       id: 'bird1',
@@ -624,4 +632,23 @@ function StartScreen({
       )}
     </div>
   )
+}
+
+const useTelegramUser = () => {
+  const [nickname, setNickname] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Verifica que estás en Telegram WebApp
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      const telegram = window.Telegram.WebApp
+
+      // Obtén los datos del usuario
+      const user = telegram.initDataUnsafe?.user
+      if (user) {
+        setNickname(user.username || user.first_name || null)
+      }
+    }
+  }, [])
+
+  return nickname
 }
