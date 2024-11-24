@@ -42,10 +42,12 @@ export function FlappyModeGame() {
   const [level, setLevel] = useState(1)
   const [selectedBird, setSelectedBird] = useState('bird1')
   const [playerName, setPlayerName] = useState('Chad')
-  const [highScores, setHighScores] = useState<
-    { nickname: string; score: number }[]
-  >([])
+  // const [highScores, setHighScores] = useState<
+  //   { nickname: string; score: number }[]
+  // >([])
   const [scoreUpdated, setScoreUpdated] = useState(false)
+  // const [showEarnScreen, setShowEarnScreen] = useState(false)
+  // const [showRankingScreen, setShowRankingScreen] = useState(false)
 
   const jump = useCallback(() => {
     if (!gameOver && gameStarted) {
@@ -216,7 +218,8 @@ export function FlappyModeGame() {
           fetchHighScoresError.message,
         )
       } else {
-        setHighScores(scores || [])
+        // setHighScores(scores || [])
+        console.error('scores', scores)
       }
     } catch (error) {
       console.error('Unexpected error in handleGameOver:', error)
@@ -232,6 +235,8 @@ export function FlappyModeGame() {
         backgroundPosition: 'center',
       }}
     >
+      {/* {showEarnScreen && <EarnScreen />}
+      {showRankingScreen && <RankingScreen />} */}
       <div onClick={gameStarted ? jump : undefined}>
         {!gameStarted && !gameOver && (
           <StartScreen
@@ -246,9 +251,9 @@ export function FlappyModeGame() {
         {gameOver ? (
           <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-blue-300/60 backdrop-blur-sm z-20">
             <h2
-              className="text-4xl text-[#ff2c2c] mb-4"
+              className="text-4xl text-[#DFFE00] mb-4"
               style={{
-                textShadow: '1px 1px 1px #ffffff, -1px -1px 1px #ffffff',
+                textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
               }}
             >
               Game Over
@@ -280,10 +285,7 @@ export function FlappyModeGame() {
               </div>
             )}
 
-            <button
-              onClick={resetGame}
-              className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-black px-4 py-2"
-            >
+            <button onClick={resetGame} className="py-14">
               <Image
                 src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/restartbtn"
                 alt="Restart Game"
@@ -296,14 +298,14 @@ export function FlappyModeGame() {
               />
             </button>
 
-            <h2 className="text-left text-[#DFFE00] text-2xl mt-7">
+            {/* <h2 className="text-left text-[#DFFE00] text-2xl mt-7">
               Leaderboard
             </h2>
             {highScores.map((entry, index) => (
               <div key={index} className="text-left text-white">
                 {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
               </div>
-            ))}
+            ))} */}
           </div>
         ) : null}
 
@@ -460,8 +462,9 @@ function StartScreen({
         </div>
         <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
       </div>
+      {/* // className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-black px-4 py-2" */}
       <button
-        className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-black px-4 py-2"
+        className="py-14"
         onClick={() => {
           if (selectedBird && playerName) {
             setGameStarted(true)
@@ -482,33 +485,3 @@ function StartScreen({
     </div>
   )
 }
-
-// function LeaderBoard({
-//   highScores,
-// }: {
-//   highScores: { nickname: string; score: number }[]
-// }) {
-//   return (
-//     <div className="absolute top-4 right-4 text-[#DFFE00] bg-black/50 p-2">
-//       <h3 className="text-lg">High Scores</h3>
-//       <ul>
-//         {highScores.map((entry, index) => (
-//           <li key={index} className="text-white">
-//             {index + 1}. {entry.nickname}: {format(entry.score, '0.00 a')}
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   )
-// }
-
-// function Button({ onclick, label }: { onclick: () => void; label: string }) {
-//   return (
-//     <button
-//       onClick={onclick}
-//       className="text-base px-4 p-1 bg-[#DFFE00] text-[#000000] hover:bg-[#DFFE00]/90 mt-4 cursor-pointer"
-//     >
-//       {label}
-//     </button>
-//   )
-// }
