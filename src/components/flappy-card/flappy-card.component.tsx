@@ -225,9 +225,9 @@ export function FlappyModeGame() {
 
   return (
     <div
-      className="relative flex flex-col bg-black items-end justify-center w-full"
+      className="relative flex flex-col bg-white/10 items-end justify-center w-full"
       style={{
-        backgroundImage: `url('https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappybg')`,
+        backgroundImage: `url('https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/bgmarine')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -244,22 +244,28 @@ export function FlappyModeGame() {
         )}
 
         {gameOver ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-black z-10">
-            <h2 className="text-3xl text-[#DFFE00] mb-4">Game Over</h2>
+          <div className="absolute inset-0 flex flex-col items-center justify-between px-4 py-8 bg-blue-300/60 backdrop-blur-sm z-20">
+            <h2
+              className="text-4xl text-[#ff2c2c] mb-4"
+              style={{
+                textShadow: '1px 1px 1px #ffffff, -1px -1px 1px #ffffff',
+              }}
+            >
+              Game Over
+            </h2>
             <div className="text-center p-3 justify-center items-center flex flex-col h-max-[250px] w-full">
               <Image
                 src={
                   selectedBird === 'bird1'
-                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar001'
                     : selectedBird === 'bird2'
-                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2'
-                    : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar002'
+                    : 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar005'
                 }
                 alt="Selected Bird"
                 width={80}
                 height={80}
-                className="rounded-full"
-                style={{ filter: 'drop-shadow(5px 0px 10px #DFFE00)' }}
+                className="rounded-full h-28 w-auto"
               />
               <p className="mb-4 text-lg text-white">{`Score: ${format(
                 score,
@@ -274,12 +280,19 @@ export function FlappyModeGame() {
               </div>
             )}
 
-            <button onClick={resetGame}>
+            <button
+              onClick={resetGame}
+              className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-black px-4 py-2"
+            >
               <Image
-                src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/reset-flappy"
+                src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/restartbtn"
                 alt="Restart Game"
                 width={80}
                 height={80}
+                className="w-auto h-20"
+                style={{
+                  filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))',
+                }}
               />
             </button>
 
@@ -297,21 +310,22 @@ export function FlappyModeGame() {
         {gameStarted ? (
           <div className="absolute inset-0 flex flex-col items-center justify-between p-4 bg-black/20 overflow-hidden">
             <div
-              className="w-auto h-16 absolute shadow-2xl rounded-full"
+              className="w-auto h-16 absolute shadow-2xl rounded-full z-10"
               style={{ top: playerPosition, left: 50 }}
             >
               <Image
                 src={
                   selectedBird === 'bird1'
-                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar001'
                     : selectedBird === 'bird2'
-                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2'
-                    : 'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3'
+                    ? 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar002'
+                    : 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar005'
                 }
                 alt="Selected Bird"
                 width={PLAYER_WIDTH}
                 height={PLAYER_HEIGHT}
-                className="rounded-full"
+                className="h-20 w-auto"
+                style={{ filter: 'drop-shadow(5px 0px 10px #DFFE00)' }}
               />
             </div>
 
@@ -370,13 +384,20 @@ function StartScreen({
 }: StartScreenProps) {
   const [isInputFocused, setIsInputFocused] = useState(false)
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-around space-y-4 h-full z-10 bg-black/80">
+    <div className="absolute inset-0 flex flex-col items-center h-full z-10 bg-blue-300/60 backdrop-blur-sm">
       <div
         className={`p-2 rounded flex flex-col justify-center items-center ${
           isInputFocused ? 'border border-[#DFFE00]' : ''
         }`}
       >
-        <label className="text-[#DFFE00]">nickname</label>
+        {/* <label
+          className="text-[#DFFE00]"
+          style={{
+            textShadow: '1px 1px 2px #293B94, -1px -1px 2px #293B94',
+          }}
+        >
+          Welcome,
+        </label> */}
         <input
           type="text"
           value={playerName}
@@ -384,24 +405,22 @@ function StartScreen({
           onClick={(e) => e.stopPropagation()}
           onFocus={() => setIsInputFocused(true)}
           onBlur={() => setIsInputFocused(false)}
-          className={`px-2 py-1 outline-none bg-transparent text-white text-2xl uppercase text-center`}
+          className={`px-2 py-14 outline-none bg-transparent text-[#DFFE00] text-4xl uppercase text-center `}
+          style={{
+            textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+          }}
           maxLength={20}
         />
       </div>
       <div>
-        {/* ${
-          selectedBird === 'bird1'
-            ? 'drop-shadow-[0_35px_35px_rgba(223,254,0,1.1)]'
-            : 'm-1 p-1 grayscale'
-        } */}
         <div className="text-[#DFFE00] text-center pb-2">Choose yours!</div>
         <div className="flex gap-2 my-3">
           <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode1"
+            src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar001"
             alt="Bird 1"
-            width={60}
-            height={60}
-            className={'cursor-pointer w-auto h-16'}
+            width={PLAYER_WIDTH}
+            height={PLAYER_HEIGHT}
+            className={`cursor-pointer w-auto h-[80px]`}
             style={{
               filter:
                 selectedBird === 'bird1'
@@ -411,11 +430,11 @@ function StartScreen({
             onClick={() => setSelectedBird('bird1')}
           />
           <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode2"
+            src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar002"
             alt="Bird 2"
             width={60}
             height={60}
-            className={'cursor-pointer w-auto h-16'}
+            className={`cursor-pointer w-auto h-[80px]`}
             style={{
               filter:
                 selectedBird === 'bird2'
@@ -425,11 +444,11 @@ function StartScreen({
             onClick={() => setSelectedBird('bird2')}
           />
           <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/flappymode3"
+            src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar005"
             alt="Bird 3"
             width={60}
             height={60}
-            className={'cursor-pointer w-auto h-16'}
+            className={`cursor-pointer w-auto h-[80px]`}
             style={{
               filter:
                 selectedBird === 'bird3'
@@ -442,7 +461,7 @@ function StartScreen({
         <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
       </div>
       <button
-        // className="bg-[#DFFE00] text-black"
+        className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-black px-4 py-2"
         onClick={() => {
           if (selectedBird && playerName) {
             setGameStarted(true)
@@ -452,12 +471,13 @@ function StartScreen({
         }}
       >
         <Image
-          src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/play-flappy"
+          src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/playbtn"
           alt="Flappy Play"
           width={80}
           height={80}
+          className="w-auto h-20"
+          style={{ filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))' }}
         />
-        {/* Start Game */}
       </button>
     </div>
   )
