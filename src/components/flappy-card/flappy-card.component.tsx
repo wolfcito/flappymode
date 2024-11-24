@@ -26,7 +26,7 @@ interface Candle {
 interface StartScreenProps {
   readonly playerName: string
   readonly setPlayerName: (value: string) => void
-  readonly selectedBird: string
+  // readonly selectedBird: string
   readonly setSelectedBird: (value: string) => void
   readonly setGameStarted: (value: boolean) => void
 }
@@ -241,7 +241,7 @@ export function FlappyModeGame() {
             setPlayerName={setPlayerName}
             playerName={playerName}
             setGameStarted={setGameStarted}
-            selectedBird={selectedBird}
+            // selectedBird={selectedBird}
             setSelectedBird={setSelectedBird}
           />
         )}
@@ -366,14 +366,159 @@ export function FlappyModeGame() {
   )
 }
 
+// function StartScreen({
+//   playerName,
+//   setPlayerName,
+//   selectedBird,
+//   setSelectedBird,
+//   setGameStarted,
+// }: StartScreenProps) {
+//   const [isInputFocused, setIsInputFocused] = useState(false)
+//   return (
+//     <div className="absolute inset-0 flex flex-col items-center h-full z-10 bg-blue-300/60 backdrop-blur-sm">
+//       <div
+//         className={`p-2 rounded flex flex-col justify-center items-center ${
+//           isInputFocused ? 'border border-[#DFFE00]' : ''
+//         }`}
+//       >
+//         {/* <label
+//           className="text-[#DFFE00]"
+//           style={{
+//             textShadow: '1px 1px 2px #293B94, -1px -1px 2px #293B94',
+//           }}
+//         >
+//           Welcome,
+//         </label> */}
+//         <input
+//           type="text"
+//           value={playerName}
+//           onChange={(e) => setPlayerName(e.target.value)}
+//           onClick={(e) => e.stopPropagation()}
+//           onFocus={() => setIsInputFocused(true)}
+//           onBlur={() => setIsInputFocused(false)}
+//           className={`px-2 py-14 outline-none bg-transparent text-[#DFFE00] text-4xl uppercase text-center `}
+//           style={{
+//             textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+//           }}
+//           maxLength={20}
+//         />
+//       </div>
+//       <div>
+//         <div className="text-[#DFFE00] text-center pb-2">Choose yours!</div>
+//         <div className="flex gap-2 my-3">
+//           <Image
+//             src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar001"
+//             alt="Bird 1"
+//             width={PLAYER_WIDTH}
+//             height={PLAYER_HEIGHT}
+//             className={`cursor-pointer w-auto h-[80px]`}
+//             style={{
+//               filter:
+//                 selectedBird === 'bird1'
+//                   ? 'drop-shadow(0px 0px 5px #DFFE00)'
+//                   : 'grayscale(100%)',
+//             }}
+//             onClick={() => setSelectedBird('bird1')}
+//           />
+//           <Image
+//             src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar002"
+//             alt="Bird 2"
+//             width={60}
+//             height={60}
+//             className={`cursor-pointer w-auto h-[80px]`}
+//             style={{
+//               filter:
+//                 selectedBird === 'bird2'
+//                   ? 'drop-shadow(0px 0px 5px #DFFE00)'
+//                   : 'grayscale(100%)',
+//             }}
+//             onClick={() => setSelectedBird('bird2')}
+//           />
+//           <Image
+//             src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar005"
+//             alt="Bird 3"
+//             width={60}
+//             height={60}
+//             className={`cursor-pointer w-auto h-[80px]`}
+//             style={{
+//               filter:
+//                 selectedBird === 'bird3'
+//                   ? 'drop-shadow(0px 0px 5px #DFFE00)'
+//                   : 'grayscale(100%)',
+//             }}
+//             onClick={() => setSelectedBird('bird3')}
+//           />
+//         </div>
+//         <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
+//       </div>
+
+//       <button
+//         className="py-14"
+//         onClick={() => {
+//           if (selectedBird && playerName) {
+//             setGameStarted(true)
+//           } else {
+//             alert('Please enter your name and select a bird.')
+//           }
+//         }}
+//       >
+//         <Image
+//           src="https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/playbtn"
+//           alt="Flappy Play"
+//           width={80}
+//           height={80}
+//           className="w-auto h-28"
+//           style={{ filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))' }}
+//         />
+//       </button>
+//     </div>
+//   )
+// }
+
 function StartScreen({
   playerName,
   setPlayerName,
-  selectedBird,
   setSelectedBird,
   setGameStarted,
 }: StartScreenProps) {
   const [isInputFocused, setIsInputFocused] = useState(false)
+  const [avatarIndex, setAvatarIndex] = useState(0)
+
+  // Avatars disponibles
+  const avatars = [
+    {
+      id: 'bird1',
+      src: 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar001',
+    },
+    {
+      id: 'bird2',
+      src: 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar002',
+    },
+    {
+      id: 'bird3',
+      src: 'https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar005',
+    },
+  ]
+
+  // Funciones para navegar entre avatars
+  const handlePreviousAvatar = () => {
+    setAvatarIndex((prevIndex) =>
+      prevIndex === 0 ? avatars.length - 1 : prevIndex - 1,
+    )
+  }
+
+  const handleNextAvatar = () => {
+    setAvatarIndex((prevIndex) =>
+      prevIndex === avatars.length - 1 ? 0 : prevIndex + 1,
+    )
+  }
+
+  // Actualizamos el avatar seleccionado
+  useEffect(() => {
+    setSelectedBird(avatars[avatarIndex].id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [avatarIndex, setSelectedBird])
+
   return (
     <div className="absolute inset-0 flex flex-col items-center h-full z-10 bg-blue-300/60 backdrop-blur-sm">
       <div
@@ -381,14 +526,6 @@ function StartScreen({
           isInputFocused ? 'border border-[#DFFE00]' : ''
         }`}
       >
-        {/* <label
-          className="text-[#DFFE00]"
-          style={{
-            textShadow: '1px 1px 2px #293B94, -1px -1px 2px #293B94',
-          }}
-        >
-          Welcome,
-        </label> */}
         <input
           type="text"
           value={playerName}
@@ -403,62 +540,68 @@ function StartScreen({
           maxLength={20}
         />
       </div>
-      <div>
-        <div className="text-[#DFFE00] text-center pb-2">Choose yours!</div>
-        <div className="flex gap-2 my-3">
-          <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar001"
-            alt="Bird 1"
-            width={PLAYER_WIDTH}
-            height={PLAYER_HEIGHT}
-            className={`cursor-pointer w-auto h-[80px]`}
-            style={{
-              filter:
-                selectedBird === 'bird1'
-                  ? 'drop-shadow(0px 0px 5px #DFFE00)'
-                  : 'grayscale(100%)',
-            }}
-            onClick={() => setSelectedBird('bird1')}
-          />
-          <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar002"
-            alt="Bird 2"
-            width={60}
-            height={60}
-            className={`cursor-pointer w-auto h-[80px]`}
-            style={{
-              filter:
-                selectedBird === 'bird2'
-                  ? 'drop-shadow(0px 0px 5px #DFFE00)'
-                  : 'grayscale(100%)',
-            }}
-            onClick={() => setSelectedBird('bird2')}
-          />
-          <Image
-            src="https://res.cloudinary.com/guffenix/image/upload/f_gif,q_auto,e_loop/v1/flappymode/avatar005"
-            alt="Bird 3"
-            width={60}
-            height={60}
-            className={`cursor-pointer w-auto h-[80px]`}
-            style={{
-              filter:
-                selectedBird === 'bird3'
-                  ? 'drop-shadow(0px 0px 5px #DFFE00)'
-                  : 'grayscale(100%)',
-            }}
-            onClick={() => setSelectedBird('bird3')}
-          />
+      <div className="flex flex-col items-center space-y-4">
+        <div
+          className="text-white text-center pb-2"
+          style={{
+            textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+          }}
+        >
+          Pick yours:
         </div>
-        <p className="mt-4 text-sm text-slate-100 text-center italic font-semibold">{`tap - tap - tap!`}</p>
+
+        {/* Botones de navegación y avatar */}
+        <div className="flex items-center gap-4 flex-1">
+          <button onClick={handlePreviousAvatar}>
+            <Image
+              src={
+                'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/leftbtn'
+              }
+              alt="Selected Bird"
+              width={80}
+              height={80}
+              className="w-auto h-8"
+            />
+          </button>
+          <div className="w-60 flex items-center justify-center">
+            <Image
+              src={avatars[avatarIndex].src}
+              alt="Selected Bird"
+              width={80}
+              height={80}
+              className="w-auto h-28"
+              style={{ filter: 'drop-shadow(0px 0px 5px #DFFE00)' }}
+            />
+          </div>
+          <button onClick={handleNextAvatar}>
+            <Image
+              src={
+                'https://res.cloudinary.com/guffenix/image/upload/f_auto,q_auto/v1/flappymode/rightbtn'
+              }
+              alt="Selected Bird"
+              width={80}
+              height={80}
+              className="w-auto h-8"
+            />
+          </button>
+        </div>
+        <div
+          className="text-white text-center pb-2"
+          style={{
+            textShadow: '1px 1px 1px #293B94, -1px -1px 1px #293B94',
+          }}
+        >
+          {`tap - tap - tap!`}
+        </div>
       </div>
 
       <button
         className="py-14"
         onClick={() => {
-          if (selectedBird && playerName) {
+          if (playerName) {
             setGameStarted(true)
           } else {
-            alert('Please enter your name and select a bird.')
+            alert('Please enter your name.')
           }
         }}
       >
