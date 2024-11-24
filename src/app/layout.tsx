@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import localFont from 'next/font/local'
+import { NavMenu } from '@/components/nav-menu'
 
 const quickZap = localFont({
   src: '/fonts/QuickZap.ttf',
@@ -27,7 +28,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${quickZap.variable} antialiased`}>{children}</body>
+      <body className={`${quickZap.variable} antialiased bg-black text-white`}>
+        {children}
+        <NavMenu />
+      </body>
     </html>
   )
 }
