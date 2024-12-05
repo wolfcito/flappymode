@@ -327,7 +327,10 @@ export function FlappyModeGame() {
                 width={PLAYER_WIDTH}
                 height={PLAYER_HEIGHT}
                 className="h-20 w-auto"
-                style={{ filter: 'drop-shadow(0px 0px 5px #ffffff)' }}
+                style={{
+                  filter: 'drop-shadow(0px 0px 5px #ffffff)',
+                  userSelect: 'none',
+                }}
               />
             </div>
 
