@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname } from 'next/navigation' // Cambia useRouter por usePathname
+import { usePathname } from 'next/navigation'
 import { Crown, Shell, ListCheck } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -23,6 +23,7 @@ export function NavMenu() {
               className="w-auto h-24"
               style={{
                 filter: 'drop-shadow(1px 5px 5px rgb(147 197 253 / 0.6))',
+                userSelect: 'none',
               }}
             />
           </Link>
